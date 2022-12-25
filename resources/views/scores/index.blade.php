@@ -11,6 +11,17 @@
 <body style="background: lightgray">
 
 <div class="container mt-5">
+
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <div class="card border-0 shadow rounded">
+                <div class="card-body">
+                    <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-md-12">
             <div class="card border-0 shadow rounded">
@@ -50,7 +61,8 @@
                                     <td>D</td>
                                 @endif
                                 <td class="text-center">
-                                    <form onsubmit="return confirm('Apakah Anda Yakin ?');" action="{{ route('scores.destroy', $score->id) }}" method="POST">
+                                    <form onsubmit="return confirm('Apakah Anda Yakin ?');"
+                                          action="{{ route('scores.destroy', $score->id) }}" method="POST">
                                         <a href="{{ route('scores.edit', $score->id) }}" class="btn btn-sm btn-primary">EDIT</a>
                                         @csrf
                                         @method('DELETE')
@@ -75,6 +87,45 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+
+<script>
+    let A = 0, B = 0, C = 0, D = 0;
+    const xValues = ["A", "B", "C", "D"];
+    @foreach ($scores as $score)
+        @if(($score->quiz_score + $score->assignment_score + $score->absence_score + $score->practical_score + $score->final_score)/5 > 85)
+            A ++;
+        @elseif(($score->quiz_score + $score->assignment_score + $score->absence_score + $score->practical_score + $score->final_score)/5 > 75 and ($score->quiz_score + $score->assignment_score + $score->absence_score + $score->practical_score + $score->final_score)/5 <= 85)
+            B++;
+        @elseif(($score->quiz_score + $score->assignment_score + $score->absence_score + $score->practical_score + $score->final_score)/5 > 65 and ($score->quiz_score + $score->assignment_score + $score->absence_score + $score->practical_score + $score->final_score)/5 <= 75)
+            C++;
+        @else
+            D++;
+        @endif
+    @endforeach
+
+
+    const yValues = [A, B, C, D];
+    const barColors = ["red", "green", "blue", "orange"];
+
+    new Chart("myChart", {
+        type: "bar",
+        data: {
+            labels: xValues,
+            datasets: [{
+                backgroundColor: barColors,
+                data: yValues
+            }]
+        },
+        options: {
+            legend: {display: false},
+            title: {
+                display: true,
+                text: "World Wine Production 2018"
+            }
+        }
+    });
+</script>
 
 <script>
     //message with toastr
